@@ -47,65 +47,30 @@ chosen_week = 1
 
 # set desired date
 chosen_date = "2013-04-15"  # NHL - 2013 (for 2012)
-# chosen_date = "2013-04-16"  # NHL - 2013
-# chosen_date = "2021-10-25"  # NHL - 2021
-# chosen_date = "2021-04-01"  # MLB - 2021
-# chosen_date = "2022-04-10"  # MLB - 2022
 
 # set desired Yahoo Fantasy Sports game code
 game_code = "nfl"  # NFL
-# game_code = "nhl"  # NHL
-# game_code = "mlb"  # MLB
 
 # set desired Yahoo Fantasy Sports game ID (see the get_all_yahoo_fantasy_game_keys query to retrieve values)
-# game_id = 331  # NFL - 2014
-# game_id = 348  # NFL - 2015 (testing for league with divisions)
-# game_id = 390  # NFL - 2019
-# game_id = 399  # NFL - 2020
 game_id = 406  # NFL - 2021
-# game_id = 303  # NHL - 2012
-# game_id = 411  # NHL - 2021
-# game_id = 404  # MLB - 2021
-# game_id = 412  # MLB - 2022
 
 # set desired Yahoo Fantasy Sports game key (see the get_all_yahoo_fantasy_game_keys query to retrieve values)
-# game_key = "331"  # NFL - 2014
-# game_key = "348"  # NFL - 2015 (testing for league with divisions)
-# game_key = "390"  # NFL - 2019
-# game_key = "399"  # NFL - 2020
 game_key = "406"  # NFL - 2021
-# game_key = "303"  # NHL - 2012
-# game_key = "411"  # NHL - 2021
-# game_key = "404"  # MLB - 2021
-# game_key = "412"  # MLB - 2022
 
-# set desired league ID (see README.md for finding value)
-# league_id = "907359"  # NFL - 2015 (testing for league with divisions)
-# league_id = "79230"  # NFL - 2019
-# league_id = "655434"  # NFL - 2020
+# set desired league ID (see README.md for finding value) - REQUIRED
 league_id = "413954"  # NFL - 2021
-# league_id = "69624"  # NHL - 2012
-# league_id = "101592"  # NHL - 2021
-# league_id = "40134"  # MLB - 2021
 
 # set desired team ID within desired league
 team_id = 1  # NFL
-# team_id = 2  # NHL (2012)
 
 # set desired team name within desired league
 team_name = "Legion"  # NFL
-# team_name = "The Bateleurs"  # NHL (2012)
 
 # set desired team ID within desired league
 player_id = 7200  # NFL: Aaron Rodgers - 2020/2021
-# player_id = 4588  # NHL: Braden Holtby - 2012
-# player_id = 8205  # NHL: Jeffrey Viel - 2021
-# player_id = 3637  # NHL: Alex Ovechkin - 2021
-# player_id = 9897  # MLB: Tim Anderson - 2021/2022
 
 # set the maximum number players you wish the get_league_players query to retrieve
 league_player_limit = 101
-# league_player_limit = 2610
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # QUERY SETUP # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -145,10 +110,14 @@ print(repr(yahoo_query.get_game_stat_categories_by_game_id(game_id)))
 print(repr(yahoo_query.get_game_position_types_by_game_id(game_id)))
 print(repr(yahoo_query.get_game_roster_positions_by_game_id(game_id)))
 print(repr(yahoo_query.get_league_key(season)))
+# Return User guid
 print(repr(yahoo_query.get_current_user()))
+# Return all user games
 print(repr(yahoo_query.get_user_games()))
 print(repr(yahoo_query.get_user_leagues_by_game_key(game_key)))
+# Return ALL of users past + present teams
 print(repr(yahoo_query.get_user_teams()))
+
 print(repr(yahoo_query.get_league_info()))
 print(repr(yahoo_query.get_league_metadata()))
 print(repr(yahoo_query.get_league_settings()))
@@ -157,12 +126,17 @@ print(repr(yahoo_query.get_league_teams()))
 print(repr(yahoo_query.get_league_players(player_count_limit=10, player_count_start=0)))
 print(repr(yahoo_query.get_league_draft_results()))
 print(repr(yahoo_query.get_league_transactions()))
+
+# These two functions appear to return the same thing
 print(repr(yahoo_query.get_league_scoreboard_by_week(chosen_week)))
 print(repr(yahoo_query.get_league_matchups_by_week(chosen_week)))
+
 print(repr(yahoo_query.get_team_info(team_id)))
 print(repr(yahoo_query.get_team_metadata(team_id)))
+# Returns season point total for team
 print(repr(yahoo_query.get_team_stats(team_id)))
-print(repr(yahoo_query.get_team_stats_by_week(team_id, chosen_week)))
+print(repr(yahoo_query.get_team_stats_by_week(team_id, chosen_week))) # Make this work
+# Returns season record for team
 print(repr(yahoo_query.get_team_standings(team_id)))
 print(repr(yahoo_query.get_team_roster_by_week(team_id, chosen_week)))
 print(repr(yahoo_query.get_team_roster_player_info_by_week(team_id, chosen_week)))
