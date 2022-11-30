@@ -21,3 +21,6 @@ private*.json
 token*.json
 *.env
 !EXAMPLE.env
+
+# Environments
+.venv
