@@ -2316,6 +2316,95 @@ class YahooFantasySportsQuery(object):
             ["team", "roster", "0", "players"]
         )
 
+    def get_team_roster_player_stats_by_date(self, team_id: Union[str, int],
+                                             chosen_date: Union[int, str] = "current") -> List[Dict[str, Player]]:
+        """Retrieve roster with player stats of specific team by team_id and by week for chosen league.
+
+        Args:
+            team_id (str | int): Selected team ID for which to retrieva data (can be integers 1 through n where n is the
+                number of teams in the league).
+            chosen_week (int): Selected week for which to retrieve data.
+
+        Examples:
+            >>> from pathlib import Path
+            >>> from yfpy.query import YahooFantasySportsQuery
+            >>> query = YahooFantasySportsQuery(Path("/path/to/auth/directory"), league_id="######")
+            >>> query.get_team_roster_player_stats_by_week(1, 1)
+            [
+              {
+                "player": {
+                  "bye_weeks": {
+                    "week": "10"
+                  },
+                  "display_position": "QB",
+                  "editorial_player_key": "nfl.p.5228",
+                  "editorial_team_abbr": "NE",
+                  "editorial_team_full_name": "New England Patriots",
+                  "editorial_team_key": "nfl.t.17",
+                  "eligible_positions": {
+                    "position": "QB"
+                  },
+                  "has_player_notes": 1,
+                  "headshot": {
+                    "size": "small",
+                    "url": "https://s.yimg.com/iu/api/res/1.2/_U9UJlrYMsJ22DpA..S3zg--~C
+                        /YXBwaWQ9eXNwb3J0cztjaD0yMzM2O2NyPTE7Y3c9MTc5MDtkeD04NTc7ZHk9MDtmaT11bGNyb3A7aD02MDtxPTEwMDt
+                        3PTQ2/https://s.yimg.com/xe/i/us/sp/v/nfl_cutout/players_l/08212019/5228.png"
+                  },
+                  "is_undroppable": "0",
+                  "name": {
+                    "ascii_first": "Tom",
+                    "ascii_last": "Brady",
+                    "first": "Tom",
+                    "full": "Tom Brady",
+                    "last": "Brady"
+                  },
+                  "player_id": "5228",
+                  "player_key": "331.p.5228",
+                  "player_notes_last_timestamp": 1568837880,
+                  "player_points": {
+                    "coverage_type": "week",
+                    "week": "1",
+                    "total": 10.26
+                  },
+                  "player_stats": {
+                    "coverage_type": "week",
+                    "week": "1",
+                    "stats": [
+                      {
+                        "stat": {
+                          "stat_id": "4",
+                          "value": "249"
+                        }
+                      },
+                      ...
+                    ]
+                  },
+                  "position_type": "O",
+                  "primary_position": "QB",
+                  "selected_position": {
+                    "coverage_type": "week",
+                    "is_flex": 0,
+                    "position": "QB",
+                    "week": "1"
+                  },
+                  "uniform_number": "12"
+                }
+              },
+              ...
+            ]
+
+        Returns:
+            list[dict[str, Player]]: List of dictionaries with key = "player" and value = YFPY Player instance
+            containing the "player_stats" key (returns a YFPY PlayerStats instance).
+
+        """
+        team_key = f"{self.get_league_key()}.t.{team_id}"
+        return self.query(
+            f"https://fantasysports.yahooapis.com/fantasy/v2/team/{team_key}/roster;date={chosen_date}/players/stats",
+            ["team", "roster", "0", "players"]
+        )
+
     def get_team_roster_player_stats_by_week(self, team_id: Union[str, int],
                                              chosen_week: Union[int, str] = "current") -> List[Dict[str, Player]]:
         """Retrieve roster with player stats of specific team by team_id and by week for chosen league.
