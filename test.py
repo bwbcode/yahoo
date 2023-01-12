@@ -163,25 +163,45 @@ weekBoundDict = {}
 for i in weeks:
     weekBoundDict[i['game_week'].week] = list(pd.date_range(start=i['game_week'].start,end=i['game_week'].end))
 
+
+team_id = 1
+leagueStats = {}
+#while team_id <= 12:
 totalStats = {}
-dailyStatTotals = {}
-rosterDict = {}
+dailyStats = {}
+rosterStats = {}
 for day in weekBoundDict[chosen_week]:
-    dailyStatTotals[day.strftime('%Y-%m-%d')] = Counter()
+    dailyStats[day.strftime('%Y-%m-%d')] = Counter()
     data = yahoo_query.get_team_roster_player_stats_by_date(team_id, day.strftime('%Y-%m-%d'))
     # Looping through player objects
     for i in data:
-        if i['player'].name.full not in rosterDict:
-            rosterDict[i['player'].name.full] = Counter()
+        if i['player'].name.full not in rosterStats:
+            rosterStats[i['player'].name.full] = Counter()
         if i['player'].selected_position.position not in ['BN','NA','IR', 'IR+']:
-            statDict = {}
+            # 19 - W / 22 - GA / 23 - GAA / 25 - SV / 24 - SA / 26 - SV% / 27 - SO
+            calcsDict = {}
             for j in i['player'].player_stats.stats:
-                statDict[j['stat'].stat_id] = j['stat'].value
-                rosterDict[i['player'].name.full][j['stat'].stat_id] += j['stat'].value
-                dailyStatTotals[day.strftime('%Y-%m-%d')][j['stat'].stat_id] += j['stat'].value
-weeklyStatTotals = Counter()
-for day in dailyStatTotals:           
-    weeklyStatTotals.update(dailyStatTotals[day])
+                if i['player'].selected_position.position == 'G':
+                    calcsDict[j['stat'].stat_id] = j['stat'].value
+                rosterStats[i['player'].name.full][j['stat'].stat_id] += j['stat'].value
+                dailyStats[day.strftime('%Y-%m-%d')][j['stat'].stat_id] += j['stat'].value
+            if i['player'].selected_position.position == 'G' and calcsDict[24] > 0:
+                # Accounting for SOs - not the best solution but best we can do for now
+                if calcsDict[22] == 0:
+                    calcsDict['toi'] = 60
+                else:
+                    calcsDict['toi'] = (60 * calcsDict[22]) / calcsDict[23]
+                rosterStats[i['player'].name.full]['toi'] += calcsDict['toi']
+                dailyStats[day.strftime('%Y-%m-%d')]['toi'] += calcsDict['toi']
+totalStats = Counter()
+for day in dailyStats:           
+    totalStats.update(dailyStats[day])
+leagueStats[team_id] = {
+    'total': totalStats,
+    'daily': dailyStats,
+    'roster': rosterStats
+}
+team_id = team_id + 1
 
 
-print(rosterDict)
+print(leagueStats)
