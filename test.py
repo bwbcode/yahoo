@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import json
 import pandas as pd
+from collections import Counter
 from yfpy import Data
 from yfpy.query import YahooFantasySportsQuery
 
@@ -149,24 +150,29 @@ weekBoundDict = {}
 for i in weeks:
     weekBoundDict[i['game_week'].week] = list(pd.date_range(start=i['game_week'].start,end=i['game_week'].end))
 
-dailyDataDict = {}
+totalStats = {}
+dailyStatTotals = {}
 for day in weekBoundDict[chosen_week]:
+    dailyStatTotals[day.strftime('%Y-%m-%d')] = Counter()
     data = yahoo_query.get_team_roster_player_stats_by_date(team_id, day.strftime('%Y-%m-%d'))
-    filteredData = []
     for i in data:
-        statDict = {}
-        for j in i['player'].player_stats.stats:
-            statDict[j['stat'].stat_id] = j['stat'].value
-        filteredData.append({
-            'name': i['player'].name.full,
-            'team': i['player'].editorial_team_abbr,
-            'position': i['player'].selected_position.position,
-            'stats': statDict
-        })
-    dailyDataDict[day.strftime('%Y-%m-%d')] = filteredData
-
-print(dailyDataDict)
-#print(dailyDataDict[weekBoundDict[chosen_week][-1].strftime('%Y-%m-%d')])
+        if i['player'].selected_position.position not in ['BN','NA','IR', 'IR+']:
+            statDict = {}
+            for j in i['player'].player_stats.stats:
+                statDict[j['stat'].stat_id] = j['stat'].value
+                dailyStatTotals[day.strftime('%Y-%m-%d')][j['stat'].stat_id] += j['stat'].value
+            playerDict = {
+                'name': i['player'].name.full,
+                'team': i['player'].editorial_team_abbr,
+                'position': i['player'].selected_position.position,
+                'stats': statDict
+            }
+weeklyStatTotals = Counter()
+for day in dailyStatTotals:           
+    weeklyStatTotals.update(dailyStatTotals[day])
+print(weeklyStatTotals)
+#print(statDict)
+#print(dailyDataDict[weekBoundDict[chosen_week][-1].strftime('%Y-%m-%d')]['skater'][0]['stats'][1], type(dailyDataDict[weekBoundDict[chosen_week][-1].strftime('%Y-%m-%d')]['skater'][0]['stats'][1]))
 
 #data = yahoo_query.get_team_roster_player_stats_by_week(team_id, chosen_week)
 
