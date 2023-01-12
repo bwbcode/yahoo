@@ -145,52 +145,6 @@ yahoo_query = YahooFantasySportsQuery(
 # print(repr(yahoo_query.get_player_percent_owned_by_week(player_key, chosen_week)))
 # print(repr(yahoo_query.get_player_draft_analysis(player_key)))
 
-weeks = yahoo_query.get_game_weeks_by_game_id(game_id)
-weekBoundDict = {}
-for i in weeks:
-    weekBoundDict[i['game_week'].week] = list(pd.date_range(start=i['game_week'].start,end=i['game_week'].end))
-
-totalStats = {}
-dailyStatTotals = {}
-for day in weekBoundDict[chosen_week]:
-    dailyStatTotals[day.strftime('%Y-%m-%d')] = Counter()
-    data = yahoo_query.get_team_roster_player_stats_by_date(team_id, day.strftime('%Y-%m-%d'))
-    for i in data:
-        if i['player'].selected_position.position not in ['BN','NA','IR', 'IR+']:
-            statDict = {}
-            for j in i['player'].player_stats.stats:
-                statDict[j['stat'].stat_id] = j['stat'].value
-                dailyStatTotals[day.strftime('%Y-%m-%d')][j['stat'].stat_id] += j['stat'].value
-            playerDict = {
-                'name': i['player'].name.full,
-                'team': i['player'].editorial_team_abbr,
-                'position': i['player'].selected_position.position,
-                'stats': statDict
-            }
-weeklyStatTotals = Counter()
-for day in dailyStatTotals:           
-    weeklyStatTotals.update(dailyStatTotals[day])
-print(weeklyStatTotals)
-#print(statDict)
-#print(dailyDataDict[weekBoundDict[chosen_week][-1].strftime('%Y-%m-%d')]['skater'][0]['stats'][1], type(dailyDataDict[weekBoundDict[chosen_week][-1].strftime('%Y-%m-%d')]['skater'][0]['stats'][1]))
-
-#data = yahoo_query.get_team_roster_player_stats_by_week(team_id, chosen_week)
-
-# stat_dict = {}
-# for player in yahoo_query.get_team_roster_player_stats_by_week(team_id, chosen_week):
-#     for category in player['player'].player_stats.stats:
-#         try:
-#             stat_dict[category['stat'].stat_id] = stat_dict[category['stat'].stat_id]  + category['stat'].value
-#         except:
-#             stat_dict[category['stat'].stat_id]  = 0
-#             stat_dict[category['stat'].stat_id] = stat_dict[category['stat'].stat_id]  + category['stat'].value
-
-# print(stat_dict)
-
-# GP: 3
-# GS: 4
-# PPP: 14
-
 # data = yahoo_query.get_team_roster_player_info_by_week(team_id, chosen_week)
 
 # print(data)
@@ -202,3 +156,32 @@ print(weeklyStatTotals)
 #         i['player'].name.full,
 #         i['player'].player_stats.stats,
 #     )
+
+
+weeks = yahoo_query.get_game_weeks_by_game_id(game_id)
+weekBoundDict = {}
+for i in weeks:
+    weekBoundDict[i['game_week'].week] = list(pd.date_range(start=i['game_week'].start,end=i['game_week'].end))
+
+totalStats = {}
+dailyStatTotals = {}
+rosterDict = {}
+for day in weekBoundDict[chosen_week]:
+    dailyStatTotals[day.strftime('%Y-%m-%d')] = Counter()
+    data = yahoo_query.get_team_roster_player_stats_by_date(team_id, day.strftime('%Y-%m-%d'))
+    # Looping through player objects
+    for i in data:
+        if i['player'].name.full not in rosterDict:
+            rosterDict[i['player'].name.full] = Counter()
+        if i['player'].selected_position.position not in ['BN','NA','IR', 'IR+']:
+            statDict = {}
+            for j in i['player'].player_stats.stats:
+                statDict[j['stat'].stat_id] = j['stat'].value
+                rosterDict[i['player'].name.full][j['stat'].stat_id] += j['stat'].value
+                dailyStatTotals[day.strftime('%Y-%m-%d')][j['stat'].stat_id] += j['stat'].value
+weeklyStatTotals = Counter()
+for day in dailyStatTotals:           
+    weeklyStatTotals.update(dailyStatTotals[day])
+
+
+print(rosterDict)
